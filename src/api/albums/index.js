@@ -4,8 +4,18 @@ const routes = require('./routes');
 module.exports = {
   name: 'albums',
   version: '1.0.0',
-  register: async (server, { service, validator }) => {
-    const albumsHandler = new AlbumsHandler(service, validator);
+  register: async (server, { service, validator, coverValidator, storageService }) => {
+    const albumsHandler = new AlbumsHandler(service, validator, coverValidator, storageService);
     server.route(routes(albumsHandler));
+    server.route({
+      method: 'GET',
+      path: '/albums/covers/{param*}',
+      handler: {
+        directory: {
+          path: '../../../uploads/images',
+          listing: false,
+        },
+      },
+    });
   },
 };

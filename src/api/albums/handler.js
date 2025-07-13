@@ -1,13 +1,16 @@
 class AlbumsHandler {
-  constructor(service, validator) {
+   constructor(service, validator, coverValidator, storageService) {
     this._service = service;
     this._validator = validator;
+    this._coverValidator = coverValidator;
+    this._storageService = storageService;
 
     this.postAlbumHandler = this.postAlbumHandler.bind(this);
     this.getAlbumByIdHandler = this.getAlbumByIdHandler.bind(this);
     this.putAlbumByIdHandler = this.putAlbumByIdHandler.bind(this);
     this.deleteAlbumByIdHandler = this.deleteAlbumByIdHandler.bind(this);
-  }
+    this.postUploadCoverHandler = this.postUploadCoverHandler.bind(this);
+   }
 
   async postAlbumHandler(request, h) {
     this._validator.validateAlbumPayload(request.payload);
@@ -18,6 +21,25 @@ class AlbumsHandler {
       data: {
         albumId,
       },
+    });
+    response.code(201);
+    return response;
+  }
+
+  async postUploadCoverHandler(request, h) {
+    const { id } = request.params;
+    const { cover } = request.payload;
+
+    this._coverValidator.validateCoverHeaders(request.headers);
+
+    const filename = await this._storageService.writeFile(cover._data ? cover : cover, cover.hapi);
+    const coverUrl = filename;
+
+    await this._service.updateAlbumCoverById(id, coverUrl);
+
+    const response = h.response({
+      status: 'success',
+      message: 'Sampul berhasil diunggah',
     });
     response.code(201);
     return response;

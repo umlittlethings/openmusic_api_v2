@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
+const Inert = require('@hapi/inert');
 const ClientError = require('./exceptions/ClientError');
 
 const exportsApi = require('./api/exports');
@@ -33,6 +34,9 @@ const playlistSongs = require('./api/playlistSongs');
 const PlaylistSongsService = require('./services/postgres/PlaylistSongsService');
 const PlaylistSongsValidator = require('./validator/playlistSongs');
 
+const CoverValidator = require('./validator/albums/coverIndex');
+const StorageService = require('./services/storage/StorageService');
+
 const init = async () => {
   const albumsService = new AlbumsService();
   const songsService = new SongsService();
@@ -41,6 +45,7 @@ const init = async () => {
   const jwtTokenManager = new JwtTokenManager();
   const playlistsService = new PlaylistsService();
   const playlistSongsService = new PlaylistSongsService();
+  const storageService = new StorageService();
 
   const server = Hapi.server({
     port: process.env.PORT,
@@ -55,6 +60,7 @@ const init = async () => {
 
   await server.register([
     Jwt,
+    Inert,
   ]);
 
   server.auth.strategy('openmusic_jwt', 'jwt', {
@@ -77,6 +83,8 @@ const init = async () => {
       options: {
         service: albumsService,
         validator: AlbumsValidator,
+        coverValidator: CoverValidator,
+        storageService: storageService,
       },
     },
     {
