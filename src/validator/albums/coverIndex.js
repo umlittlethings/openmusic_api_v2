@@ -1,10 +1,15 @@
 const InvariantError = require('../../exceptions/InvariantError');
-const { CoverHeadersSchema } = require('./coverSchema');
+
+const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
 
 const CoverValidator = {
-  validateCoverHeaders: (headers) => {
-    const validationResult = CoverHeadersSchema.validate(headers);
-    if (validationResult.error) throw new InvariantError(validationResult.error.message);
+  validateCoverFile: (file) => {
+    if (!file || !file.hapi || !allowedMimeTypes.includes(file.hapi.headers['content-type'])) {
+      throw new InvariantError('Berkas yang diunggah harus berupa gambar');
+    }
+    if (file._data && file._data.length > 512000) {
+      throw new InvariantError('Ukuran file tidak boleh lebih dari 512000 bytes');
+    }
   },
 };
 

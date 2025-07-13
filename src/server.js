@@ -48,14 +48,19 @@ const init = async () => {
   const storageService = new StorageService();
 
   const server = Hapi.server({
-    port: process.env.PORT,
-    host: process.env.HOST,
-    routes: {
-      cors: {
-        origin: ['*'],
-      },
+  port: process.env.PORT,
+  host: process.env.HOST,
+  routes: {
+    cors: { origin: ['*'] },
+    payload: {
+      maxBytes: 512000,
+      output: 'stream',
+      parse: true,
+      multipart: true,
+      allow: ['multipart/form-data'],
     },
-  });
+  },
+});
 
 
   await server.register([

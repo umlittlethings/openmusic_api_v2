@@ -96,7 +96,10 @@ class AlbumsService {
     return {
       id: album.id,
       name: album.name,
-      coverUrl: album.cover_url ? `${process.env.HOST}:${process.env.PORT}/albums/covers/${album.cover_url}` : null,
+      year: album.year,
+      coverUrl: album.cover_url
+        ? `http://${process.env.HOST}:${process.env.PORT}/albums/covers/${album.cover_url}`
+        : null,
     };
   }
 }
