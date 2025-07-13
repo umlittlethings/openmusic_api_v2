@@ -4,6 +4,10 @@ const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
 const ClientError = require('./exceptions/ClientError');
 
+const exportsApi = require('./api/exports');
+const ProducerService = require('./services/rabbitmq/ProducerService');
+const ExportsValidator = require('./validator/exports');
+
 const albums = require('./api/albums');
 const AlbumsService = require('./services/postgres/AlbumsService');
 const AlbumsValidator = require('./validator/albums');
@@ -112,6 +116,15 @@ const init = async () => {
         playlistSongsService,
         songsService,
         validator: PlaylistSongsValidator,
+      },
+    },
+    {
+      plugin: exportsApi,
+      options: {
+        playlistsService,
+        playlistSongsService,
+        producerService: ProducerService,
+        validator: ExportsValidator,
       },
     },
   ]);
