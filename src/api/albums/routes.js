@@ -30,6 +30,8 @@ const routes = (handler) => [
         multipart: true,
         output: 'stream',
         maxBytes: 512000,
+        parse: true,
+        timeout: false
       },
     },
   },

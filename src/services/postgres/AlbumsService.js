@@ -13,8 +13,8 @@ class AlbumsService {
     const createdAt = new Date().toISOString();
 
     const query = {
-      text: 'INSERT INTO albums VALUES($1, $2, $3, $4, $4) RETURNING id',
-      values: [id, name, year, createdAt],
+      text: 'INSERT INTO albums (id, name, year, created_at, updated_at, cover_url) VALUES($1, $2, $3, $4, $5, $6) RETURNING id',
+      values: [id, name, year, createdAt, createdAt, null],
     };
 
     const result = await this._pool.query(query);
@@ -24,21 +24,6 @@ class AlbumsService {
     }
 
     return result.rows[0].id;
-  }
-
-  async getAlbumById(id) {
-    const query = {
-      text: 'SELECT * FROM albums WHERE id = $1',
-      values: [id],
-    };
-
-    const result = await this._pool.query(query);
-
-    if (!result.rows.length) {
-      throw new NotFoundError('Album tidak ditemukan');
-    }
-
-    return result.rows[0];
   }
 
   async editAlbumById(id, { name, year }) {
@@ -98,8 +83,8 @@ class AlbumsService {
       name: album.name,
       year: album.year,
       coverUrl: album.cover_url
-        ? `http://${process.env.HOST}:${process.env.PORT}/albums/covers/${album.cover_url}`
-        : null,
+        ??
+        null,
     };
   }
 }

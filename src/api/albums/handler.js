@@ -32,8 +32,10 @@ class AlbumsHandler {
 
     this._coverValidator.validateCoverFile(cover);
 
-    const filename = await this._storageService.writeFile(cover._data ? cover : cover, cover.hapi);
-    await this._service.updateAlbumCoverById(id, filename);
+    const filename = await this._storageService.writeFile(cover, cover.hapi);
+    const coverUrl = `http://${request.info.host}/albums/covers/${filename}`;
+    
+    await this._service.updateAlbumCoverById(id, coverUrl);
 
     const response = h.response({
       status: 'success',

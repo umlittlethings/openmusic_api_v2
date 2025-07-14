@@ -151,12 +151,8 @@ const init = async () => {
           status: 'fail',
           message: response.message,
         });
-        newResponse.code(response.statusCode);
+        newResponse.code(response.statusCode || 400);
         return newResponse;
-      }
-
-      if (!response.isServer) {
-        return h.continue;
       }
 
       const newResponse = h.response({
