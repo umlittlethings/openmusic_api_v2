@@ -48,25 +48,14 @@ const init = async () => {
   const storageService = new StorageService();
 
   const server = Hapi.server({
-  port: process.env.PORT,
-  host: process.env.HOST,
-  routes: {
-    cors: { origin: ['*'] },
-    payload: {
-      maxBytes: 512000,
-      output: 'stream',
-      parse: true,
-      multipart: true,
-      allow: ['multipart/form-data'],
+    port: process.env.PORT,
+    host: process.env.HOST,
+    routes: {
+      cors: { origin: ['*'] },
     },
-  },
-});
+  });
 
-
-  await server.register([
-    Jwt,
-    Inert,
-  ]);
+  await server.register([Jwt, Inert]);
 
   server.auth.strategy('openmusic_jwt', 'jwt', {
     keys: process.env.ACCESS_TOKEN_KEY,
@@ -146,6 +135,15 @@ const init = async () => {
     const { response } = request;
 
     if (response instanceof Error) {
+      if (response.output?.statusCode === 413) {
+        const newResponse = h.response({
+          status: 'fail',
+          message: 'Ukuran payload melebihi batas maksimum yang diizinkan (512 KB)',
+        });
+        newResponse.code(413);
+        return newResponse;
+      }
+
       if (response instanceof ClientError) {
         const newResponse = h.response({
           status: 'fail',
@@ -157,7 +155,7 @@ const init = async () => {
 
       const newResponse = h.response({
         status: 'error',
-        message: 'terjadi kegagalan pada server kami',
+        message: 'Terjadi kegagalan pada server kami',
       });
       newResponse.code(500);
       console.error(response);

@@ -20,6 +20,10 @@ exports.up = (pgm) => {
       type: 'TEXT',
       notNull: true,
     },
+    cover_url: {
+      type: 'TEXT',
+      notNull: false,
+    },
   });
 };
 
