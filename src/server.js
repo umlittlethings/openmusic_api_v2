@@ -10,7 +10,10 @@ const ProducerService = require('./services/rabbitmq/ProducerService');
 const ExportsValidator = require('./validator/exports');
 
 const albums = require('./api/albums');
-const AlbumsService = require('./services/postgres/AlbumsService');
+const AlbumsService = require('./services/postgres/AlbumService');
+const AlbumLikesService = require('./services/postgres/AlbumLikesService');
+const albumLikesApi = require('./api/albums/likesIndex');
+const CacheService = require('./services/postgres/CacheService');
 const AlbumsValidator = require('./validator/albums');
 
 const songs = require('./api/songs');
@@ -38,7 +41,9 @@ const CoverValidator = require('./validator/albums/coverIndex');
 const StorageService = require('./services/storage/StorageService');
 
 const init = async () => {
-  const albumsService = new AlbumsService();
+  const cacheService = new CacheService();
+  const albumsService = new AlbumsService(cacheService);
+  const albumLikesService = new AlbumLikesService(cacheService);
   const songsService = new SongsService();
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationsService();
@@ -129,12 +134,27 @@ const init = async () => {
         validator: ExportsValidator,
       },
     },
+    {
+      plugin: albumLikesApi,
+      options: {
+        albumLikesService,
+      },
+    },
   ]);
 
   server.ext('onPreResponse', (request, h) => {
     const { response } = request;
 
     if (response instanceof Error) {
+      if (response.output?.statusCode === 401) {
+        const newResponse = h.response({
+          status: 'fail',
+          message: response.message || 'Unauthorized',
+        });
+        newResponse.code(401);
+        return newResponse;
+      }
+
       if (response.output?.statusCode === 413) {
         const newResponse = h.response({
           status: 'fail',

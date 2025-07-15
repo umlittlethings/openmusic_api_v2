@@ -13,7 +13,6 @@ const init = async () => {
     if (msg !== null) {
       const { playlistId, targetEmail } = JSON.parse(msg.content.toString());
 
-      // Ambil data playlist dan lagu dari database
       const pool = new Pool();
       const playlistQuery = {
         text: `SELECT playlists.id, playlists.name, users.username
@@ -46,7 +45,7 @@ const init = async () => {
         },
       };
 
-      // Kirim email menggunakan nodemailer
+
       const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: process.env.SMTP_PORT,

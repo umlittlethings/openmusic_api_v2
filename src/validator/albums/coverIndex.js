@@ -12,8 +12,7 @@ const CoverValidator = {
     if (!allowedMimeTypes.includes(contentType)) {
       throw new InvariantError('Berkas yang diunggah harus berupa gambar');
     }
-    
-    // Gunakan content-length dari headers
+
     const contentLength = parseInt(file.hapi.headers['content-length'] || 0);
     if (contentLength > 512000) {
       throw new InvariantError('Ukuran file tidak boleh lebih dari 512000 bytes');
