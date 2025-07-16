@@ -3,11 +3,12 @@ const redis = require('redis');
 class CacheService {
   constructor() {
     this._client = redis.createClient({
-      url: process.env.REDIS_SERVER,
+      socket: {
+        host: process.env.REDIS_SERVER,
+      },
     });
     this._client.connect();
     this._client.on('error', (err) => {
-
       console.error('Redis Client Error', err);
     });
   }
