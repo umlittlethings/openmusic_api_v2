@@ -9,7 +9,7 @@ module.exports = {
     server.route(routes(albumsHandler));
     server.route({
       method: 'GET',
-      path: '/albums/covers/{param*}',
+      path: path.join(__dirname, '../../../uploads/images'),
       handler: {
         directory: {
           path: '../../../uploads/images',
