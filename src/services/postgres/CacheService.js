@@ -2,9 +2,10 @@ const redis = require('redis');
 
 class CacheService {
   constructor() {
-    this._client = redis.createClient({
+   this._client = redis.createClient({
       socket: {
         host: process.env.REDIS_SERVER,
+        port: process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT) : 6379,
       },
     });
     this._client.connect();
