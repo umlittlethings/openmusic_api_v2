@@ -1,3 +1,6 @@
+const path = require('path');
+
+
 const routes = (handler) => [
   {
     method: 'POST',
@@ -32,6 +35,16 @@ const routes = (handler) => [
         maxBytes: 512000,
         parse: true,
         timeout: false
+      },
+    },
+  },
+  {
+    method: 'GET',
+    path: '/albums/covers/{param*}',
+    handler: {
+      directory: {
+        path: path.join(__dirname, '../../../uploads/images'),
+        listing: false,
       },
     },
   },
